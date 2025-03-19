@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J A R V I S</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="resultstyle.css">
+    <style>
+        
+          #playButton {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 180px;
+            height: 2.8em;
+            background: #a370f0;
+            color: white;
+            font-family: inherit;
+            font-size: 17px;
+            font-weight: 500;
+            border-radius: 0.9em;
+            border: none;
+            letter-spacing: 0.05em;
+            box-shadow: inset 0 0 1.6em -0.6em #714da6;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        #playButton .icon {
+            background: white;
+            margin-bottom: 20px;
+            margin-left: 1em;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 2.2em;
+            width: 2.2em;
+            border-radius: 0.7em;
+            box-shadow: 0.1em 0.1em 0.6em 0.2em #7b52b9;
+            right: 0.3em;
+            transition: all 0.3s;
+        }
+
+        #introVideo {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            min-width: 100%; 
+            min-height: 100%;
+        }
+
+        #afterContent, .gif, .speak, #result {
+            display: none;
+        }
+
+        #mouth {
+            width: 50px;
+            height: 50px;
+            background-color: rgb(0, 255, 123);
+            border-radius: 50%;
+            margin: 0 auto;
+            align-items: center;
+        }
+
+        #content {
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        #content.visible {
+            opacity: 1;
+        }
+
+        #assistantVideo {
+            margin: 0 auto;
+        }
+        .video-container {
+    position: relative;
+    width: 275px;
+    height: 285px;
+    overflow: hidden;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    display: flex; /* Add Flexbox */
+    justify-content: center; /* Horizontally Center */
+    align-items: center; /* Vertically Center */
+    margin: 0 auto; /* Center container itself */
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensure video scales well */
+}
+        
+    
+#result::-webkit-scrollbar {
+        width: 10px;
+    }
+    #result::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, gold, orange);
+        border-radius: 10px;
+    }
+    #result::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg);
+    }
+
+    /* Glow animation */
+    @keyframes glowEffect {
+        0% {
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3), inset 0px 0px 10px rgba(255, 215, 0, 0.3);
+        }
+        100% {
+            box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.5), inset 0px 0px 20px rgba(255, 215, 0, 0.5);
+        }
+    }
+
+    </style>
+    <!-- Google Generative AI -->
+    <script type="importmap">
+        {
+            "imports": {
+                "@google/generative-ai": "https://esm.run/@google/generative-ai"
+            }
+        }
+    </script>
+</head>
+<body class="container my-4">
+ <div class="d-flex justify-content-center align-items-center vh-100" >
+    <video id="introVideo" muted style="width: 100%; height: auto;">
+        <source src="intro.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <button id="playButton" class="btn btn-primary" onclick="playAndUnmuteVideo()">
+        GET START
+        <div class="icon">
+            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z" fill="currentColor"></path>
+            </svg>
+        </div>
+    </button>
+</div>
+
+    <h1 class="word" id="afterContent">
+        <span>J</span>
+        <span>A</span>
+        <span>R</span>
+        <span>V</span>
+        <span>I</span>
+        <span>S</span>
+    </h1>
+    <div class="gif text-center">
+      <div id="mouth">
+          <img src="LCPT.gif" alt="" class="img-fluid" width="500" height="400" style="margin-left: -465%;">
+      </div>
+      <div class="video-container d-flex justify-content-center align-items-center mx-auto">
+        <video id="assistantVideo" loop>
+            <source src="video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+    
+  </div>
+    <br>
+    <br><br>
+    <div class="speak">
+        <button id="generate" class="btn btn-primary" hidden>Generate Story</button>
+        <button id="voice" class="btn btn-success" style="width: 50px; height: 50px;"><i class="fas fa-microphone"></i></button>
+    </div>
+
+
+
+<br>
+    <article
+      class="w-72 bg-gray-700 shadow p-4 space-y-2 rounded-md hover:-translate-y-2 duration-300"
+    >
+      <p class="text-sm w-full text-gray-400">
+        <div id="result" 
+     class="alert alert-info mt-4 scroll-box" 
+     role="alert" 
+     style="height: 300px; 
+            width: 70%; 
+            overflow: auto; 
+            background: linear-gradient(135deg, rgb(44, 44, 41), rgb(70, 70, 68)); 
+            color: white; 
+            scrollbar-base-color: gold; 
+            font-family: 'Poppins', sans-serif; 
+            padding: 20px; 
+            border-radius: 15px; 
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3), inset 0px 0px 15px rgba(255, 215, 0, 0.2); 
+            border: 1px solid rgba(255, 215, 0, 0.5); 
+            transition: transform 0.3s ease, box-shadow 0.3s ease; 
+            backdrop-filter: blur(8px); 
+            animation: glowEffect 2s infinite alternate;
+            ">
+</div>
+
+      </p>
+    </article>
+    
+
+
+
+
+
+
+
+
+
+
+
+    
+
+    <!-- External JS file -->
+    <script src="./js/scriptmygeeles.js" type="module"></script>
+    <script src="js/style.js"></script>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
+    <script>
+        function playAndUnmuteVideo() {
+            const video = document.getElementById('introVideo');
+            video.play();
+            video.muted = false;
+            document.getElementById('playButton').style.display = 'none'; // Hide the play button after clicking
+        }
+
+        // After the intro video ends, show the main content and hide the video
+        document.getElementById('introVideo').addEventListener('ended', function() {
+            document.getElementById('introVideo').style.display = 'none'; // Hide the intro video
+            document.getElementById('afterContent').style.display = 'block'; // Show main content
+            document.querySelector('.gif').style.display = 'block';
+            document.querySelector('.speak').style.display = 'block';
+            document.getElementById('result').style.display = 'block';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<html>
+  <head>
+  <link rel="stylesheet" href="/css/whatsapp.css">
+  <style>
+ /* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Full-screen background with a fantasy theme */
+body {
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    background-image: url('https://your-fantasy-background-image-url.jpg'); /* Replace with a fantasy background image URL */
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+}
+
+/* Animated background */
+@keyframes gradientAnimation {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+.background {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    animation: gradientAnimation 15s ease infinite;
+}
+
+/* Centering the form */
+form {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    width: 300px;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+form:hover {
+    transform: translate(-50%, -50%) scale(1.05);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+}
+
+h1 {
+    margin-bottom: 20px;
+    font-size: 2em;
+    color: #fffae6;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+label {
+    display: block;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+textarea.message {
+    width: 100%;
+    height: 120px;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 20px;
+    font-size: 1em;
+    resize: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    transition: background 0.3s ease;
+}
+
+textarea.message:focus {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+button {
+    background: #ff9a9e;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+button:hover {
+    background: #fad0c4;
+    transform: scale(1.05);
+}
+
+/* Adding a glowing effect */
+button:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+  </style>
+  </head>
+  <body>
+    <form>
+      <h1>Send Data To WhatsApp</h1>
+
+      <label for="message">Message</label>
+      <textarea class="message" id="message" placeholder="Your message will appear here..."></textarea>
+      <button type="button" onclick="startDictation()">Start Dictation</button>
+    </form>
+
+   <script>
+    function startDictation() {
+    if ('webkitSpeechRecognition' in window) {
+        recognition = new webkitSpeechRecognition();
+
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = "en-US";
+        recognition.start();
+
+        recognition.onresult = function(event) {
+            var transcript = event.results[0][0].transcript.toLowerCase().trim();
+            document.getElementById('message').value = transcript;
+            recognition.stop();
+
+            // Check if the command "send message to [name]" was given
+            if (transcript.startsWith("send message to")) {
+                var name = transcript.replace("send message to", "").trim();
+
+                // Send the recognized name to PHP for fetching the phone number
+                fetch('voice_command.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'name=' + encodeURIComponent(name)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.phone) {
+                        sendwhatsapp(data.phone);
+                    } else {
+                        alert('Contact not found.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            } else {
+                alert("Please say 'send message to [name]'.");
+            }
+
+            // Restart dictation after sending the message
+            recognition.onend = function() {
+                startDictation();
+            };
+        };
+
+        recognition.onerror = function(event) {
+            console.error('Speech recognition error detected: ' + event.error);
+            alert("Speech recognition error: " + event.error);
+        };
+
+        recognition.onend = function() {
+            console.log('Speech recognition service ended');
+        };
+
+    } else {
+        alert("Your browser does not support speech recognition.");
+    }
+}
+
+function sendwhatsapp(phoneNumber) {
+    var message = document.querySelector(".message").value.trim();
+    if (message === "") {
+        alert("No message detected. Please try again.");
+        return;
+    }
+    var encodedMessage = encodeURIComponent(message);
+    var url = "https://wa.me/" + phoneNumber + "?text=" + encodedMessage;
+
+    // Open WhatsApp chat
+    window.location.href = url;
+}
+
+   </script>
+  </body>
+</html>

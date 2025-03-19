@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Schedule Manager</h1>
+    
+    <div id="form-container">
+        <h2>Add New Schedule</h2>
+        <form id="schedule-form">
+            <label for="type">Type:</label>
+            <input type="text" id="type" name="type" required><br><br>
+
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required><br><br>
+
+            <label for="time">Time:</label>
+            <input type="time" id="time" name="time" required><br><br>
+
+            <label for="alarm_time">Alarm Time:</label>
+            <input type="time" id="alarm_time" name="alarm_time"><br><br>
+
+            <button type="submit">Add Schedule</button>
+        </form>
+    </div>
+
+    <div id="schedules-container">
+        <h2>Schedules</h2>
+        <ul id="schedules-list"></ul>
+    </div>
+
+    <button id="start-recording">Start Voice Command</button>
+
+    <script src="scripts.js"></script>
+</body>
+</html>

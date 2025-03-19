@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsData.io Example</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #00c6ff, #0072ff);
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+button {
+    background-color: #0072ff;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+    background-color: #005bb5;
+    transform: scale(1.05);
+}
+
+#results {
+    margin-top: 20px;
+    width: 80%;
+    max-width: 800px;
+    background: #fff;
+    color: #333;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+    </style>
+</head>
+<body>
+
+    <h1>Global News</h1>
+    <button onclick="fetchNews()">Latest News</button>
+    
+    <div id="results"></div>
+
+    <script>
+        // Define your API key
+        const apiKey = 'pub_53241bc53b7642fe3a845756aa975c2b91c14';
+        
+        // Create the request URL
+        const newsUrl = `https://newsdata.io/api/1/news?apikey=${apiKey}&country=us&language=en`;
+
+        function fetchNews() {
+            // Define request options
+            const requestOptions = {
+                method: 'GET',
+                redirect: 'follow'
+            };
+
+            // Fetch data from the API
+            fetch(newsUrl, requestOptions)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json(); // Parse JSON response
+                })
+                .then(result => {
+                    displayResults(result); // Handle the result
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error.message); // Log any errors
+                    displayError(error.message); // Display error on the page
+                });
+        }
+
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = ''; // Clear previous results
+
+            if (!data || !data.results || data.results.length === 0) {
+                resultsDiv.innerHTML = '<p>No results found.</p>';
+                return;
+            }
+
+            let newsText = 'Here are the latest news headlines: ';
+            data.results.forEach(item => {
+                const div = document.createElement('div');
+                div.innerHTML = `<strong>${item.title}</strong><br><a href="${item.link}" target="_blank">${item.link}</a>`;
+                resultsDiv.appendChild(div);
+
+                // Add the headline to the text-to-speech queue
+                newsText += `${item.title}. `;
+            });
+
+            // Read the news headlines
+            speakText(newsText);
+        }
+
+        function displayError(message) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `<p>Error: ${message}</p>`;
+        }
+
+        function speakText(text) {
+            const speech = new SpeechSynthesisUtterance();
+            const allVoices= speechSynthesis.getVoices();
+            speech.voice = allVoices[4];
+            speech.text = text;
+            window.speechSynthesis.speak(speech);
+        }
+        window.onload = function(){
+            speakText("  ");
+}
+    </script>
+
+</body>
+</html>
