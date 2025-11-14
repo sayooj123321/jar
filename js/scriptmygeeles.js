@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-const API_KEY = "AIzaSyD0aZL2TC0KwSU60VkAdXLM88LkcR-krSY";
+const API_KEY = "AIzaSyDsAxDkfQWcYZxuC7rxRZO7AXPWE6oOfjo";
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -528,4 +528,5 @@ document.getElementById("voice").addEventListener("click", () => {
 
 window.onload = function(){
     speakResponse("  ");
+
 }
